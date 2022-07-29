@@ -1,24 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import SelectCountry from './components/SelectCountry/SelectCountry';
+import Highlight from './components/Highlight/Highlight';
+import Summary from './components/Summary/Summary';
+import { useEffect, useState } from 'react';
+import { getCountries, getReportByCountry } from './fetchData';
+import { Typography, Container } from '@material-ui/core';
+import moment from 'moment';
+import 'moment/locale/vi';
+import { sortBy } from 'lodash';
+import '@fontsource/roboto';
+
+moment.locale('vi');
 
 function App() {
+  const [countries, setCountries] = useState([]);
+  const [selectedCountryId, setSelectedCountryId] = useState('');
+  const [report, setReport] = useState([]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      let res = await getCountries();
+      const sortCountries = sortBy(res.data, 'Country');
+      setCountries(sortCountries);
+      setSelectedCountryId('vn');
+    };
+    fetchCountries();
+  }, []);
+
+  const handleChange = async (e) => {
+    setSelectedCountryId(e.target.value);
+  };
+
+  useEffect(() => {
+    if (selectedCountryId) {
+      const { Slug } = countries.find((c) => c.ISO2.toLowerCase() === selectedCountryId);
+      getReportByCountry(Slug).then((res) => {
+        // xoa di item cuoi cung trong array res.data
+        res.data.pop();
+        setReport(res.data);
+      });
+    }
+  }, [countries, selectedCountryId]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container style={{ marginTop: 24 }}>
+      <Typography variant='h2' component='h2'>
+        Số liệu COVID-19
+      </Typography>
+      <Typography>{moment().format('LLL')}</Typography>
+
+      <SelectCountry countries={countries} handleChange={handleChange} value={selectedCountryId} />
+      <Highlight report={report} />
+      <Summary report={report} selectedCountryId={selectedCountryId} />
+    </Container>
   );
 }
 
