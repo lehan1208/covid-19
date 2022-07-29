@@ -17,13 +17,13 @@ function App() {
   const [report, setReport] = useState([]);
 
   useEffect(() => {
-    const fetchCountries = async () => {
+    const fetchData = async () => {
       let res = await getCountries();
       const sortCountries = sortBy(res.data, 'Country');
       setCountries(sortCountries);
       setSelectedCountryId('vn');
     };
-    fetchCountries();
+    fetchData();
   }, []);
 
   const handleChange = async (e) => {
@@ -33,11 +33,13 @@ function App() {
   useEffect(() => {
     if (selectedCountryId) {
       const { Slug } = countries.find((c) => c.ISO2.toLowerCase() === selectedCountryId);
-      getReportByCountry(Slug).then((res) => {
+      const fetchData = async () => {
+        let res = await getReportByCountry(Slug);
         // xoa di item cuoi cung trong array res.data
         res.data.pop();
         setReport(res.data);
-      });
+      };
+      fetchData();
     }
   }, [countries, selectedCountryId]);
 

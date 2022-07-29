@@ -47,7 +47,6 @@ const HighMaps = ({ mapData }) => {
 
   useEffect(() => {
     if (mapData && Object.keys(mapData).length) {
-      console.log({ mapData });
       const fakeData = mapData.features.map((feature, index) => ({
         key: feature.properties['hc-key'],
         value: index,
@@ -76,7 +75,12 @@ const HighMaps = ({ mapData }) => {
   if (!mapLoaded) return null;
 
   return (
-    <HighchartsReact highcharts={Highcharts} options={cloneDeep(options)} constructorType={'mapChart'} ref={chartRef} />
+    <HighchartsReact
+      highcharts={Highcharts}
+      options={cloneDeep(options)}
+      constructorType={'mapChart'}
+      ref={chartRef}
+    />
   );
 };
 
